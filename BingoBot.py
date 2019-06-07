@@ -56,9 +56,9 @@ def call_ball(group_id=group_id):
     time.sleep(5)
     r = yammer.messages.create(all_balls, replied_to_id=replied_to_id)
 
-def start_game():
+def start_game(wait=900):
     while check_access_token():
         call_ball()
-        time.sleep(30)
+        time.sleep(wait)
     else:
         return False
