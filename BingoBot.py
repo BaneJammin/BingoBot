@@ -4,11 +4,13 @@ import yampy
 import random
 import BingoBotConfig
 import time
+import json
 
 group_id = BingoBotConfig.group_id #as an int
 access_token = BingoBotConfig.access_token #as a string
 yammer = yampy.Yammer(access_token=access_token) #as a string
 picked = {column:[] for column in 'BINGO'}
+savegame = '.\savegame.txt'
 
 def check_access_token():
     try:
@@ -25,23 +27,25 @@ def pick():
     letter = f'{"BINGO"[(number - 1) // 15]}'
     return (letter, number)
 
-def new_ball(dict=picked):
+def new_ball(picked=picked, savegame=savegame):
     '''Check that the picked ball is unique and add it to the dict.'''
     letter, number = pick()    
-    while number in dict[letter]:
+    while number in picked[letter]:
         print(f'{letter} {number}: Repicking...')
         letter, number = pick()
-    dict[letter].append(number)
+    picked[letter].append(number)
+    with open(savegame, 'w') as f:
+        f.write(json.dumps(picked))
     return (letter, number)
 
-def format_called(dict=picked):
+def format_called(picked=picked):
     '''Format the dict of called balls for human-readable printing.'''
-    for i in dict:
-        dict[i] = sorted(dict[i])
+    for i in picked:
+        picked[i] = sorted(picked[i])
     s = ''
     for letter in 'BINGO':
         s += f'{letter}: '
-        for called in dict[letter]:
+        for called in picked[letter]:
             s += f'{called} '
         s += '\n'
     return s
@@ -59,6 +63,8 @@ def call_ball(group_id=group_id):
 def start_game(wait=900):
     while check_access_token():
         call_ball()
-        time.sleep(wait)
+        #looping on range(wait) in 1s intervals allows for KeyboardInterrupt
+        for i in range(wait):
+            time.sleep(1)
     else:
         return False
