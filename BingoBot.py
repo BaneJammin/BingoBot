@@ -1,17 +1,24 @@
-#!python3.7
-
 import yampy
 import random
 import BingoBotConfig
 import time
 import json
+from collections import OrderedDict
 
-group_id = BingoBotConfig.group_id #as an int
-access_token = BingoBotConfig.access_token #as a string
+group_id = 1234567890 #as an int
+access_token = 'asdasdasdas' #as a string
 yammer = yampy.Yammer(access_token=access_token) #as a string
-picked = {column:[] for column in 'BINGO'}
 savegame = '.\savegame.txt'
 
+def load_game(to_load):
+    global picked
+    if to_load is not None:
+        with open(savegame, 'r') as f:
+            picked = OrderedDict(json.loads(f.readline()))
+    else:
+        picked = OrderedDict({column:[] for column in 'BINGO'})
+    return picked
+    
 def check_access_token():
     try:
         user = yammer.client.get('/users/current')
@@ -27,7 +34,7 @@ def pick():
     letter = f'{"BINGO"[(number - 1) // 15]}'
     return (letter, number)
 
-def new_ball(picked=picked, savegame=savegame):
+def new_ball():
     '''Check that the picked ball is unique and add it to the dict.'''
     letter, number = pick()    
     while number in picked[letter]:
@@ -38,7 +45,7 @@ def new_ball(picked=picked, savegame=savegame):
         f.write(json.dumps(picked))
     return (letter, number)
 
-def format_called(picked=picked):
+def format_called():
     '''Format the dict of called balls for human-readable printing.'''
     for i in picked:
         picked[i] = sorted(picked[i])
@@ -50,7 +57,7 @@ def format_called(picked=picked):
         s += '\n'
     return s
 
-def call_ball(group_id=group_id):
+def call_ball():
     '''Post the verified-unique ball to the Yammer API as a new thread,
     then reply to that thread with the listing of all called balls.'''
     ball = new_ball()
@@ -60,7 +67,8 @@ def call_ball(group_id=group_id):
     time.sleep(5)
     r = yammer.messages.create(all_balls, replied_to_id=replied_to_id)
 
-def start_game(wait=900):
+def start_game(wait=900, to_load=None):
+    load_game(to_load)
     while check_access_token():
         call_ball()
         #looping on range(wait) in 1s intervals allows for KeyboardInterrupt
@@ -68,3 +76,5 @@ def start_game(wait=900):
             time.sleep(1)
     else:
         return False
+
+start_game()
