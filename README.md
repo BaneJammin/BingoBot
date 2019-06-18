@@ -26,7 +26,7 @@ Call `start_game()` to start the script. Optional keyword argument `wait=` (defa
 ## To-do
 
 * ~~Core gameplay functions~~ done
-* File handling (save/load external dict in case of script interruption)
+* ~~File handling (save/load external dict in case of script interruption)~~ done
 * Exception handling (connection errors, posting errors)
 * Logging (and CPU time measuring if using PA -- see below)
 
