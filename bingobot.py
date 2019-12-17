@@ -1,4 +1,4 @@
-# import yampy
+import yampy
 import random
 import config
 import time
@@ -6,18 +6,18 @@ import json
 
 group_id = config.group_id
 access_token = config.access_token #as a string
-# yammer = yampy.Yammer(access_token=access_token) #as a string
+yammer = yampy.Yammer(access_token=access_token) #as a string
 picked = {column:[] for column in 'BINGO'}
 savegame = r'.\savegame.txt'
 
-# def auth():
-#     try:
-#         user = yammer.client.get('/users/current')
-#         return True
-#     except yampy.errors.UnauthorizedError as e:
-#         print('UnauthorizedError: Please refresh access_token at \n'
-#               'https://www.yammer.com/client_applications and update BingoBotConfig.py')
-#         return False
+def auth():
+    try:
+        user = yammer.client.get('/users/current')
+        return True
+    except yampy.errors.UnauthorizedError as e:
+        print('UnauthorizedError: Please refresh access_token at \n'
+              'https://www.yammer.com/client_applications and update BingoBotConfig.py')
+        return False
 
 def pick_new(number=None, picked=picked):
     '''Add a new ball to the list'''
@@ -44,14 +44,14 @@ def call_ball(group_id=group_id):
     then reply to that thread with the listing of all called balls.'''
     ball = pick_new()
     all_balls = format_called()
-    # m = yammer.messages.create(f'{ball[0]}{ball[1]}', group_id=group_id)
+    m = yammer.messages.create(f'{ball[0]}{ball[1]}', group_id=group_id)
     print(f'{ball[0]}{ball[1]}')
-    #replied_to_id = m['messages'][0]['thread_id']
+    replied_to_id = m['messages'][0]['thread_id']
     time.sleep(5)
-    # r = yammer.messages.create(all_balls, replied_to_id=replied_to_id)    
+    r = yammer.messages.create(all_balls, replied_to_id=replied_to_id)    
 
-def start_game(wait=15):
-    if True: #auth():
+def start_game(wait=900):
+    if auth():
         call_ball()
         #looping on range(wait) in 1s intervals allows for KeyboardInterrupt
         for i in range(wait):
