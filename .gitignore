@@ -1,5 +1,6 @@
 #project-specific configs
 config.py
+.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
